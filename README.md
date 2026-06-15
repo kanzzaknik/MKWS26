@@ -12,7 +12,8 @@ mechanism (GRI-Mech 3.0) so the effects can be compared on equal footing:
 1. **Adiabatic flame temperature** — constant-enthalpy (HP) equilibrium
 2. **Laminar flame speed** — 1-D freely-propagating premixed flame
 3. **Auto-ignition delay** — 0-D constant-pressure reactor (Arrhenius sweep)
-4. **NO formation** — equilibrium NO in the burned gas
+4. **NO formation** — equilibrium NO *and* finite-rate (post-flame) NO kinetics
+5. **Pressure dependence** — auto-ignition delay power law $\tau \propto p^{n}$
 
 ## Key result
 
@@ -35,13 +36,18 @@ entirely while producing a CO₂-rich, capture-ready exhaust.
 ### Equilibrium NO vs equivalence ratio
 ![NO vs phi](results/fig7_nox_vs_phi.png)
 
+### Kinetic (post-flame) NO formation
+![Kinetic NO](results/fig9_no_kinetics.png)
+
+*Dilution suppresses NO kinetically as well as thermodynamically: at the flame temperature, air builds NO over tens of ms while EGR and oxy-fuel stay near zero.*
+
 ### Laminar flame speed
 ![Flame speed vs phi](results/fig3_flamespeed_vs_phi.png)
 
 ### Auto-ignition delay (Arrhenius)
 ![Ignition delay](results/fig5_ignition_arrhenius.png)
 
-All eight figures live in [`results/`](results/) and the underlying numbers in
+All ten figures live in [`results/`](results/) and the underlying numbers in
 [`results/data/`](results/data/) as CSV.
 
 ## How to run
@@ -51,8 +57,8 @@ Requires Python 3.10+.
 ```bash
 pip install -r requirements.txt
 
-# fast sections (equilibrium, ignition, NOx) + their figures
-python -m src.run equilibrium ignition nox
+# fast sections (equilibrium, ignition, NOx, kinetic NO, pressure) + figures
+python -m src.run equilibrium ignition nox nox_kinetics pressure
 
 # 1-D laminar flames (slower; resumable helper, rerun until COMPLETE)
 python gen_incremental.py flame_phi_air

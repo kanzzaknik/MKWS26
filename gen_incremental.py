@@ -14,8 +14,8 @@ DRIVER_BUDGET = 37      # s, total per invocation
 
 JOBS = {
     "flame_phi_air":   ("phi",          [0.6, 0.8, 1.0, 1.2, 1.4]),
-    "flame_phi_oxy":   ("phi",          [0.6, 1.0, 1.4]),
-    "flame_phi_egr":   ("phi",          [0.8, 1.0, 1.2]),
+    "flame_phi_oxy":   ("phi",          [0.6, 0.8, 1.0, 1.2, 1.4]),
+    "flame_phi_egr":   ("phi",          [0.6, 0.8, 1.0, 1.2, 1.4]),
     "flame_egr_speed": ("egr_fraction", [0.0, 0.07, 0.14, 0.20]),
     "flame_oxy_speed": ("x_o2",         [0.21, 0.27, 0.33, 0.40]),
 }

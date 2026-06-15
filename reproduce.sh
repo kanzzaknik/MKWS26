@@ -3,7 +3,7 @@
 # Equilibrium / ignition / NOx are fast; the 1-D flames are the slow part and
 # are generated with a resumable helper (rerun until it prints COMPLETE).
 set -e
-python -m src.run equilibrium ignition nox
+python -m src.run equilibrium ignition nox nox_kinetics pressure
 
 for job in flame_phi_air flame_phi_oxy flame_phi_egr flame_egr_speed flame_oxy_speed; do
     until python gen_incremental.py "$job" | tee /dev/stderr | grep -q COMPLETE; do
