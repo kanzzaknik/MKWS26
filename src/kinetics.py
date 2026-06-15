@@ -50,3 +50,16 @@ def sweep_egr_ignition(T0=1100.0, n=12):
     fracs = np.linspace(0.0, cfg.EGR_FRACTION_MAX, n)
     tau = [ignition_delay(gas, mx.egr_mixture(gas, 1.0, f), T0) for f in fracs]
     return {"egr_fraction": fracs, "tau": tau}
+
+
+def sweep_pressure(T0=1100.0, p_atm=(1, 2, 5, 10, 20, 40), n=None):
+    """Ignition delay vs pressure at fixed initial temperature (CH4/air, phi=1).
+
+    Returns pressures [atm] and delays [s]; a power-law fit tau ~ p^m is
+    reported separately by the caller.
+    """
+    gas = ct.Solution(cfg.MECHANISM)
+    comp = mx.air_mixture(1.0)
+    P = np.asarray(p_atm, dtype=float)
+    tau = [ignition_delay(gas, comp, T0, P=p * cfg.P_REF) for p in P]
+    return {"p_atm": P, "tau": np.asarray(tau)}

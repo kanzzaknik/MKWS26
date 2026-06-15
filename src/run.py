@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 
 from . import equilibrium as eq
 from . import kinetics as kin
+from . import nox_kinetics as nk
 from . import flame as fl
 from . import plots as P
 
@@ -160,10 +161,41 @@ def run_flame_plots():
     P._fig("fig4_flamespeed_vs_dilution.png")
 
 
+def run_nox_kinetics():
+    d = nk.compare_regimes(t_end=0.5)
+    store = {"t_ms": d["air"]["t"] * 1e3,
+             "air": d["air"]["NO_ppm"], "egr": d["egr"]["NO_ppm"], "oxy": d["oxy"]["NO_ppm"]}
+    P.save_csv("no_kinetics.csv", store)
+    plt.semilogx(d["air"]["t"] * 1e3, d["air"]["NO_ppm"], "-", color=P.C["air"], label="Air ($T_{ad}$=%.0f K)" % d["air"]["Tad"])
+    plt.semilogx(d["egr"]["t"] * 1e3, d["egr"]["NO_ppm"], "-", color=P.C["egr"], label="EGR 20%% ($T_{ad}$=%.0f K)" % d["egr"]["Tad"])
+    plt.semilogx(d["oxy"]["t"] * 1e3, d["oxy"]["NO_ppm"], "-", color=P.C["oxy"], label="Oxy-fuel ($T_{ad}$=%.0f K)" % d["oxy"]["Tad"])
+    plt.xlabel("Residence time [ms]")
+    plt.ylabel("NO [ppm]")
+    plt.title("Kinetic (post-flame) NO formation at the flame temperature")
+    plt.legend()
+    P._fig("fig9_no_kinetics.png")
+
+
+def run_pressure():
+    r = kin.sweep_pressure()
+    P.save_csv("ignition_vs_pressure.csv", r)
+    m, b = np.polyfit(np.log(r["p_atm"]), np.log(r["tau"]), 1)
+    fit = np.exp(b) * r["p_atm"] ** m
+    plt.loglog(r["p_atm"], np.asarray(r["tau"]) * 1e3, "o", color=P.C["air"], label="Cantera")
+    plt.loglog(r["p_atm"], fit * 1e3, "--", color="0.4", label=r"fit $\tau \propto p^{%.2f}$" % m)
+    plt.xlabel("Pressure [atm]")
+    plt.ylabel("Ignition delay [ms]")
+    plt.title("Auto-ignition delay vs pressure (CH$_4$/air, $\phi=1$, 1100 K)")
+    plt.legend()
+    P._fig("fig10_ignition_vs_pressure.png")
+
+
 SECTIONS = {
     "equilibrium": run_equilibrium,
     "ignition": run_ignition,
     "nox": run_nox,
+    "nox_kinetics": run_nox_kinetics,
+    "pressure": run_pressure,
     "flame_air": lambda: run_flame_case("air"),
     "flame_egr": lambda: run_flame_case("egr"),
     "flame_oxy": lambda: run_flame_case("oxy"),
@@ -175,7 +207,7 @@ SECTIONS = {
 def main():
     args = sys.argv[1:] or ["all"]
     if args == ["all"]:
-        order = ["equilibrium", "ignition", "nox", "flame_air", "flame_egr",
+        order = ["equilibrium", "ignition", "nox", "nox_kinetics", "pressure", "flame_air", "flame_egr",
                  "flame_oxy", "flame_dilution", "flame_plots"]
     else:
         order = args
